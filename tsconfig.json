@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "lib": ["ES2015"],
+        "lib": ["ES2015", "ES2015.Iterable", "DOM", "DOM.Iterable"],
         "target": "ES2015",
         "moduleResolution": "Node",
         "esModuleInterop": true,
@@ -9,7 +9,6 @@
         "allowJs": true,
         "declaration": true,
         "emitDeclarationOnly": true,
-        "strict": true,
         "declarationDir": "dist",
         "outDir": "dist",
     },
