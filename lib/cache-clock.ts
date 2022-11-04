@@ -16,6 +16,8 @@ import { timeProvider } from "./time-provider";
 type ClockMap = Map<string, ClockItem>;
 type CacheTTL = number;
 
+type Timeout = number | NodeJS.Timeout;
+
 export interface ClockItem {
     /**
      * Hashed key of the item.
@@ -84,6 +86,13 @@ const DEFAULT_CLOCK_OPTIONS: ClockOptions = {
     debug: false
 };
 
+function invokeTimeout(callback: Function, delay: number): Timeout {
+    const timeout =
+        environment === "node" ? global.setTimeout : window.setTimeout;
+
+    return timeout.call(null, callback, delay);
+}
+
 function parseCacheOptions(
     options: ClockOptions = {},
     defaultOptions: ClockOptions
@@ -120,13 +129,6 @@ function parseCacheOptions(
         opts.maxItems = 1;
     }
 
-    if (opts.interval < 15000) {
-        debug(
-            "A cache clock interval less than 15 seconds is not recommended.",
-            "yellow"
-        );
-    }
-
     return opts;
 }
 
@@ -141,8 +143,8 @@ function createEntityKey(key: string, isHashed: boolean): string {
 export class CacheClock {
     private readonly $birth: number;
     private readonly $cache: ClockMap;
-    private readonly $clock: any;
 
+    private $clock: Timeout;
     private $options: ClockOptions;
 
     /**
@@ -159,6 +161,22 @@ export class CacheClock {
         this.$cache = new Map();
 
         this.configure(options);
+
+        this.start();
+    }
+
+    private prune(): void {
+        this.stop();
+
+        const now = timeProvider.now();
+
+        for (const value of this) {
+            if (value.e <= now) {
+                this.del(value.k, true);
+            }
+        }
+
+        this.start();
     }
 
     /**
@@ -211,6 +229,13 @@ export class CacheClock {
         this.$options = parseCacheOptions(options, DEFAULT_CLOCK_OPTIONS);
 
         debug.DEBUG = this.$options.debug;
+
+        if (this.$options.interval < DEFAULT_CLOCK_OPTIONS.interval) {
+            debug(
+                "A cache clock interval less than 15 seconds is not recommended.",
+                "yellow"
+            );
+        }
     }
 
     /**
@@ -222,9 +247,14 @@ export class CacheClock {
      */
     public start(): void {
         if (this.$clock) {
-            debug("Cache clock is already running. Unable to start.", "yellow");
+            debug("Cache clock is already running. Unable to start.", "red");
             return;
         }
+
+        this.$clock = invokeTimeout(
+            this.prune.bind(this),
+            this.$options.interval
+        );
     }
 
     /**
@@ -233,9 +263,12 @@ export class CacheClock {
      */
     public stop(): void {
         if (!this.$clock) {
-            debug("Cache clock is not running. Unable to stop.", "yellow");
+            debug("Cache clock is not running. Unable to stop.", "red");
             return;
         }
+
+        clearTimeout(this.$clock);
+        this.$clock = null;
     }
 
     /**
@@ -287,7 +320,7 @@ export class CacheClock {
         }
 
         if (item.e < timeProvider.now()) {
-            debug(`Cache item ${key} has expired.`, "yellow");
+            debug(`Cache item ${key} has expired.`, "red");
             this.del(key, true);
             return undefined;
         }
@@ -308,7 +341,7 @@ export class CacheClock {
             return undefined;
         }
 
-        debug(`Deleting cache item ${key}.`, "yellow");
+        debug(`Deleting cache item ${key}.`, "green");
         this.$cache.delete(hashedKey);
 
         return item;
