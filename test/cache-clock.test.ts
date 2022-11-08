@@ -22,6 +22,8 @@ describe("Cache Clock", () => {
 
             chai.expect(cache).to.be.instanceOf(CacheClock);
             chai.expect(cacheInstance).to.be.instanceOf(CacheClock);
+
+            cacheInstance.stop();
         });
 
         it("should create a new instance with a custom config", () => {
