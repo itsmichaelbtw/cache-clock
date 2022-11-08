@@ -1,16 +1,17 @@
 {
   "name": "cache-clock",
   "version": "1.0.0",
-  "description": "",
-  "main": "",
-  "module": "",
-  "unpkg": "",
-  "jsdelivr": "",
-  "types": "",
+  "description": "An in-memory cache clock with TTL based expiry built for NodeJS and the browser.",
+  "main": "dist/common/index.cjs",
+  "module": "dist/module/index.esm.js",
+  "unpkg": "dist/cache-clock.js",
+  "jsdelivr": "dist/cache-clock.js",
+  "types": "dist/cache-clock.d.ts",
+  "type": "module",
   "exports": {
-    "import": "./",
-    "require": "./",
-    "default": "./"
+    "import": "./dist/module/index.esm.js",
+    "require": "./dist/common/index.cjs",
+    "default": "./dist/module/index.esm.js"
   },
   "files": [
     "dist",
@@ -22,8 +23,15 @@
   ],
   "scripts": {
     "test": "ts-mocha -p tsconfig.json --recursive test/**/*.test.ts",
+    "build": "rimraf dist && tsc && rollup -c rollup.config.js --bundleConfigAsCjs",
     "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "prettier:write": "prettier --write .",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:prerelease": "standard-version --prerelease",
+    "release": "standard-version",
+    "push:tags": "git push origin --follow-tags"
   },
   "repository": {
     "type": "git",
@@ -42,6 +50,8 @@
   "devDependencies": {
     "@babel/preset-env": "^7.19.4",
     "@babel/preset-typescript": "^7.18.6",
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
     "@rollup/plugin-babel": "^6.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "^9.0.2",
@@ -55,6 +65,7 @@
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "rollup": "^3.2.3",
+    "rollup-plugin-bundle-size": "^1.0.3",
     "standard-version": "^9.5.0",
     "terser": "^5.15.1",
     "ts-loader": "^9.4.1",
@@ -75,9 +86,5 @@
   "contributors": [
     "Michael Cizek <itsmichaelbtw@gmail.com>"
   ],
-  "license": "MIT",
-  "dependencies": {
-    "@commitlint/cli": "^17.1.2",
-    "@commitlint/config-conventional": "^17.1.0"
-  }
+  "license": "MIT"
 }
