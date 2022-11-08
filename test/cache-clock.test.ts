@@ -2,7 +2,7 @@ import chai from "chai";
 
 import { CacheClock } from "../lib/cache-clock";
 
-const cache: CacheClock = new CacheClock();
+const cache = new CacheClock();
 
 describe("Cache Clock", () => {
     beforeEach(() => {
@@ -18,7 +18,10 @@ describe("Cache Clock", () => {
 
     describe("constructor", () => {
         it("should create a new instance of the cache clock", () => {
+            const cacheInstance = CacheClock.create();
+
             chai.expect(cache).to.be.instanceOf(CacheClock);
+            chai.expect(cacheInstance).to.be.instanceOf(CacheClock);
         });
 
         it("should create a new instance with a custom config", () => {
