@@ -52,8 +52,6 @@ export interface ClockOptions {
     /**
      * The default time to live for items in the cache.
      *
-     * You can disable the cache clock by setting this value to `Infinity` or `0`.
-     *
      * Defaults to `Infinity`.
      *
      */
@@ -188,7 +186,7 @@ export class CacheClock {
      * const clock = new CacheClock({ ttl: 5 * 60 * 1000 });
      * ```
      */
-    static create(options: ClockOptions): CacheClock {
+    static create(options: ClockOptions = {}): CacheClock {
         return new CacheClock(options);
     }
 
