@@ -238,7 +238,10 @@ export class CacheClock {
      * ```
      */
     public configure(options: ClockOptions = {}): void {
-        this.$options = parseCacheOptions(options, DEFAULT_CLOCK_OPTIONS);
+        this.$options = parseCacheOptions(
+            options,
+            this.options || DEFAULT_CLOCK_OPTIONS
+        );
 
         debug.DEBUG = this.options.debug;
 
