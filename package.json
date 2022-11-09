@@ -74,6 +74,7 @@
   },
   "standard-version": {
     "scripts": {
+      "prebump": "npm run build",
       "posttag": "npm run push:tags"
     }
   },
