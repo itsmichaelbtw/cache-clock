@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
@@ -28,21 +28,21 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
+      - name: Release
       - uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ github.ref }}
+          name: ${{ github.ref.replace('refs/tags/', '') }}
           tag: ${{ github.ref }}
           body: |
             See [CHANGELOG.md](CHANGELOG.md) for details.
-      - run: npm ci
-      - run: npm run build
   publish:
     needs: release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - name: Use Node.js 18.x
+      - uses: actions/setup-node@v3
         with:
           node-version: 18.x
           registry-url: https://registry.npmjs.org/
