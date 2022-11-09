@@ -32,7 +32,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ github.ref.replace('refs/tags/', '') }}
+          name: ${{ github.ref_name }}
           tag: ${{ github.ref }}
           body: |
             See [CHANGELOG.md](CHANGELOG.md) for details.
