@@ -226,9 +226,9 @@ export class CacheClock {
     public configure(options: ClockOptions = {}): void {
         this.$options = parseCacheOptions(options, DEFAULT_CLOCK_OPTIONS);
 
-        debug.DEBUG = this.$options.debug;
+        debug.DEBUG = this.options.debug;
 
-        if (this.$options.interval < DEFAULT_CLOCK_OPTIONS.interval) {
+        if (this.options.interval < DEFAULT_CLOCK_OPTIONS.interval) {
             debug(
                 "A cache clock interval less than 15 seconds is not recommended.",
                 "yellow"
@@ -251,7 +251,7 @@ export class CacheClock {
 
         this.$clock = invokeTimeout(
             this.prune.bind(this),
-            this.$options.interval
+            this.options.interval
         );
     }
 
@@ -281,7 +281,7 @@ export class CacheClock {
     ): this {
         const hashedKey = createEntityKey(key, false);
 
-        const { ttl } = parseCacheOptions(options, this.$options);
+        const { ttl } = parseCacheOptions(options, this.options);
 
         const clockItem: ClockItem = {
             k: hashedKey,
@@ -290,11 +290,11 @@ export class CacheClock {
             e: timeProvider.now() + ttl
         };
 
-        if (this.$cache.has(hashedKey)) {
-            this.$cache.delete(hashedKey);
+        if (this.has(hashedKey, true)) {
+            this.del(hashedKey);
         }
 
-        if (this.$cache.size >= this.$options.maxItems) {
+        if (this.size >= this.options.maxItems) {
             debug("The cache is full, removing oldest item.", "yellow");
             this.del(this.$cache.keys().next().value, true);
         }
