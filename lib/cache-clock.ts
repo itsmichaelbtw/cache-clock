@@ -71,6 +71,16 @@ export interface ClockOptions {
      */
     interval?: number;
     /**
+     * Programatically determine if you wish for the clock to auto start.
+     *
+     * This only works when first initializing the clock. If you wish to
+     * start or stop the clock after initialization, use the `start` and `stop`
+     * methods.
+     *
+     * Defaults to `true`.
+     */
+    autoStart?: boolean;
+    /**
      * A function to call when an item has expired. This is called exclusively
      * when an item has expired and is removed from the cache via the internal clock.
      */
@@ -87,7 +97,8 @@ const DEFAULT_CLOCK_OPTIONS: ClockOptions = {
     maxItems: 1000,
     ttl: Infinity,
     interval: 15 * 1000,
-    debug: false
+    debug: false,
+    autoStart: true
 };
 
 function invokeTimeout(callback: Function, delay: number): Timeout {
@@ -170,7 +181,9 @@ export class CacheClock {
 
         this.configure(options);
 
-        this.start();
+        if (this.options.autoStart) {
+            this.start();
+        }
     }
 
     private prune(): void {

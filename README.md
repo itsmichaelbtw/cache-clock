@@ -136,17 +136,18 @@ cache.options;
 
 ### configure([, options])
 
-Update the cache clock configuration. Use this method to update the cache clock configuration after the clock has been initialized. Any items in the cache prior to calling this method will not be affected.
+Update the cache clock configuration. Use this method to update the cache clock configuration after the clock has been initialized. Any items in the cache prior to calling this method will not be affected. It is recommended to instead pass these options when initializing the constructor.
 
 #### options
 
-| Option   | Default  | Description                                                                                                                     |
-|----------|----------|---------------------------------------------------------------------------------------------------------------------------------|
-| maxItems | 1000     | The maximum number of items to store in the cache at once. Exceeding this limit will remove the oldest entry.                   |
-| ttl      | Infinity | The time to live for all entries in the cache.                                                                                  |
-| interval | 15000    | The interval in ms to check for expired items. It is recommended to keep this value above `15 seconds` for optimal performance. |
-| onExpire | null     | A function to call when an item has expired.                                                                                    |
-| debug    | false    | Log debug messages to the console. Includes success, warning and error messages.                                                |
+| Option    | Default  | Description                                                                                                                     |
+|-----------|----------|---------------------------------------------------------------------------------------------------------------------------------|
+| maxItems  | 1000     | The maximum number of items to store in the cache at once. Exceeding this limit will remove the oldest entry.                   |
+| ttl       | Infinity | The time to live for all entries in the cache.                                                                                  |
+| interval  | 15000    | The interval in ms to check for expired items. It is recommended to keep this value above `15 seconds` for optimal performance. |
+| onExpire  | null     | A function to call when an item has expired.                                                                                    |
+| autoStart | true     | Programmatically determine if you wish for the clock to auto start.                                                             |
+| debug     | false    | Log debug messages to the console. Includes success, warning and error messages.                                                |
 
 > Note: When passing either Infinity or 0 as the interval, this disables the internal clock. If a clock has already started, once it has finished its current cycle, it will stop.
 
