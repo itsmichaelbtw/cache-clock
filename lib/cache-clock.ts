@@ -5,7 +5,8 @@ import {
     isNegative,
     absolute,
     shallowMerge,
-    stringify
+    stringify,
+    isFunction
 } from "../lib/utils";
 
 import { environment } from "./environment";
@@ -13,12 +14,12 @@ import { debug } from "./debug";
 import { hash } from "./hash";
 import { timeProvider } from "./time-provider";
 
-type ClockMap = Map<string, ClockItem>;
+type ClockMap = Map<string, CacheEntry>;
 type CacheTTL = number;
 
 type Timeout = number | NodeJS.Timeout;
 
-export interface ClockItem {
+export interface CacheEntry {
     /**
      * Hashed key of the item.
      */
@@ -69,6 +70,11 @@ export interface ClockOptions {
      * Defaults to `15 seconds`.
      */
     interval?: number;
+    /**
+     * A function to call when an item has expired. This is called exclusively
+     * when an item has expired and is removed from the cache via the internal clock.
+     */
+    onExpire?(entry: CacheEntry): void;
     /**
      * Log debug messages to the console.
      */
@@ -123,6 +129,10 @@ function parseCacheOptions(
         opts.interval = defaultOptions.interval;
     }
 
+    if (opts.onExpire && !isFunction(opts.onExpire)) {
+        opts.onExpire = undefined;
+    }
+
     if (opts.maxItems === 0) {
         opts.maxItems = 1;
     }
@@ -170,7 +180,11 @@ export class CacheClock {
 
         for (const value of this) {
             if (value.e <= now) {
-                this.del(value.k, true);
+                const entry = this.del(value.k, true);
+
+                if (this.options.onExpire && entry) {
+                    this.options.onExpire(entry);
+                }
             }
         }
 
@@ -291,7 +305,7 @@ export class CacheClock {
 
         const { ttl } = parseCacheOptions(options, this.options);
 
-        const clockItem: ClockItem = {
+        const clockItem: CacheEntry = {
             k: hashedKey,
             v: value,
             t: ttl,
@@ -314,9 +328,9 @@ export class CacheClock {
 
     /**
      * Retrieve an item from the cache. This returns the internal
-     * `ClockItem` used to store the value.
+     * `CacheEntry` used to store the value.
      */
-    public get(key: string, isHashed: boolean = false): ClockItem {
+    public get(key: string, isHashed: boolean = false): CacheEntry {
         const hashedKey = createEntityKey(key, isHashed);
 
         const item = this.$cache.get(hashedKey);
@@ -338,7 +352,7 @@ export class CacheClock {
      * Deletes an item from the cache. Returns the deleted item
      * if it exists.
      */
-    public del(key: string, isHashed: boolean = false): ClockItem {
+    public del(key: string, isHashed: boolean = false): CacheEntry {
         const hashedKey = createEntityKey(key, isHashed);
 
         const item = this.$cache.get(hashedKey);
@@ -369,7 +383,7 @@ export class CacheClock {
         this.$cache.clear();
     }
 
-    public [Symbol.iterator](): IterableIterator<ClockItem> {
+    public [Symbol.iterator](): IterableIterator<CacheEntry> {
         return this.$cache.values();
     }
 }

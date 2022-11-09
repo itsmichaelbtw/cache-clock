@@ -145,7 +145,10 @@ Update the cache clock configuration. Use this method to update the cache clock 
 | maxItems | 1000     | The maximum number of items to store in the cache at once. Exceeding this limit will remove the oldest entry.                   |
 | ttl      | Infinity | The time to live for all entries in the cache.                                                                                  |
 | interval | 15000    | The interval in ms to check for expired items. It is recommended to keep this value above `15 seconds` for optimal performance. |
+| onExpire | null     | A function to call when an item has expired.                                                                                    |
 | debug    | false    | Log debug messages to the console. Includes success, warning and error messages.                                                |
+
+> Note: When passing either Infinity or 0 as the interval, this disables the internal clock. If a clock has already started, once it has finished its current cycle, it will stop.
 
 ### start()
 
