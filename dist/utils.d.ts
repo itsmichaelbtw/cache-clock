@@ -1,6 +1,7 @@
 export declare function isUndefined(value: unknown): value is undefined;
 export declare function isPureObject(value: unknown): value is Record<string, unknown>;
 export declare function isNumber(value: unknown): value is number;
+export declare function isFunction(value: unknown): value is Function;
 export declare function isString(value: unknown): value is string;
 export declare function isNegative(value: number): boolean;
 export declare function absolute(value: number): number;

@@ -1,5 +1,5 @@
 declare type CacheTTL = number;
-export interface ClockItem {
+export interface CacheEntry {
     /**
      * Hashed key of the item.
      */
@@ -32,8 +32,6 @@ export interface ClockOptions {
     /**
      * The default time to live for items in the cache.
      *
-     * You can disable the cache clock by setting this value to `Infinity` or `0`.
-     *
      * Defaults to `Infinity`.
      *
      */
@@ -51,6 +49,11 @@ export interface ClockOptions {
      * Defaults to `15 seconds`.
      */
     interval?: number;
+    /**
+     * A function to call when an item has expired. This is called exclusively
+     * when an item has expired and is removed from the cache via the internal clock.
+     */
+    onExpire?(entry: CacheEntry): void;
     /**
      * Log debug messages to the console.
      */
@@ -129,14 +132,14 @@ export declare class CacheClock {
     set(key: string, value: unknown, options?: CacheSetterOptions): this;
     /**
      * Retrieve an item from the cache. This returns the internal
-     * `ClockItem` used to store the value.
+     * `CacheEntry` used to store the value.
      */
-    get(key: string, isHashed?: boolean): ClockItem;
+    get(key: string, isHashed?: boolean): CacheEntry;
     /**
      * Deletes an item from the cache. Returns the deleted item
      * if it exists.
      */
-    del(key: string, isHashed?: boolean): ClockItem;
+    del(key: string, isHashed?: boolean): CacheEntry;
     /**
      * Returns a boolean indicating whether the cache contains an item.
      */
@@ -145,6 +148,6 @@ export declare class CacheClock {
      * Wipe the cache clean.
      */
     clear(): void;
-    [Symbol.iterator](): IterableIterator<ClockItem>;
+    [Symbol.iterator](): IterableIterator<CacheEntry>;
 }
 export {};

@@ -123,6 +123,9 @@ function isPureObject(value) {
 function isNumber(value) {
   return typeof value === "number" && !isNaN(value);
 }
+function isFunction(value) {
+  return typeof value === "function";
+}
 function isString(value) {
   return typeof value === "string";
 }
@@ -232,6 +235,9 @@ function parseCacheOptions() {
   } else if (!isNumber(opts.interval)) {
     opts.interval = defaultOptions.interval;
   }
+  if (opts.onExpire && !isFunction(opts.onExpire)) {
+    opts.onExpire = undefined;
+  }
   if (opts.maxItems === 0) {
     opts.maxItems = 1;
   }
@@ -276,7 +282,10 @@ var CacheClock = /*#__PURE__*/function () {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var value = _step.value;
           if (value.e <= now) {
-            this.del(value.k, true);
+            var _entry = this.del(value.k, true);
+            if (this.options.onExpire && _entry) {
+              this.options.onExpire(_entry);
+            }
           }
         }
       } catch (err) {
@@ -340,9 +349,9 @@ var CacheClock = /*#__PURE__*/function () {
     key: "configure",
     value: function configure() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      this.$options = parseCacheOptions(options, DEFAULT_CLOCK_OPTIONS);
-      debug.DEBUG = this.$options.debug;
-      if (this.$options.interval < DEFAULT_CLOCK_OPTIONS.interval) {
+      this.$options = parseCacheOptions(options, this.options || DEFAULT_CLOCK_OPTIONS);
+      debug.DEBUG = this.options.debug;
+      if (this.options.interval < DEFAULT_CLOCK_OPTIONS.interval) {
         debug("A cache clock interval less than 15 seconds is not recommended.", "yellow");
       }
     }
@@ -357,11 +366,15 @@ var CacheClock = /*#__PURE__*/function () {
   }, {
     key: "start",
     value: function start() {
+      if (this.options.interval === Infinity || this.options.interval === 0) {
+        debug("Disabling the clock due to an unsupported interval.", "yellow");
+        return;
+      }
       if (this.$clock) {
         debug("Cache clock is already running. Unable to start.", "red");
         return;
       }
-      this.$clock = invokeTimeout(this.prune.bind(this), this.$options.interval);
+      this.$clock = invokeTimeout(this.prune.bind(this), this.options.interval);
     }
 
     /**
@@ -388,7 +401,7 @@ var CacheClock = /*#__PURE__*/function () {
     key: "set",
     value: function set(key, value, options) {
       var hashedKey = createEntityKey(key, false);
-      var _parseCacheOptions = parseCacheOptions(options, this.$options),
+      var _parseCacheOptions = parseCacheOptions(options, this.options),
         ttl = _parseCacheOptions.ttl;
       var clockItem = {
         k: hashedKey,
@@ -396,10 +409,10 @@ var CacheClock = /*#__PURE__*/function () {
         t: ttl,
         e: timeProvider.now() + ttl
       };
-      if (this.$cache.has(hashedKey)) {
-        this.$cache["delete"](hashedKey);
+      if (this.has(hashedKey, true)) {
+        this.del(hashedKey);
       }
-      if (this.$cache.size >= this.$options.maxItems) {
+      if (this.size >= this.options.maxItems) {
         debug("The cache is full, removing oldest item.", "yellow");
         this.del(this.$cache.keys().next().value, true);
       }
@@ -409,7 +422,7 @@ var CacheClock = /*#__PURE__*/function () {
 
     /**
      * Retrieve an item from the cache. This returns the internal
-     * `ClockItem` used to store the value.
+     * `CacheEntry` used to store the value.
      */
   }, {
     key: "get",
