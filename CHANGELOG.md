@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/itsmichaelbtw/cache-clock/compare/v1.0.0...v1.0.1) (2022-11-09)
+
+
+### What's New
+
+* **cache-clock:** added `onExpire` callback option ([28df250](https://github.com/itsmichaelbtw/cache-clock/commit/28df250fc85b271cb92f8b4dbd03423e655cf00e))
+
+
+### Fixed
+
+* **cache-clock:** intervals with infinity or 0 creating redundant clocks ([2478fa9](https://github.com/itsmichaelbtw/cache-clock/commit/2478fa962254ef40ef0e4b5510084663423bbaaa))
+* failed to exit unit tests as clock instance was still running ([f08e8c8](https://github.com/itsmichaelbtw/cache-clock/commit/f08e8c80d61537cf9d77d54bcd88cf5846567b7d))
+* improper use of options accessor being called internally ([cb36382](https://github.com/itsmichaelbtw/cache-clock/commit/cb36382b5f80cc3f3e1b223a4f9a09b1eba27696))
+* updating the configuration was incorrectly merging with defaults ([e1d7490](https://github.com/itsmichaelbtw/cache-clock/commit/e1d74905d4fdcef948f987b494e5df5557c63aa6))
+
 ## 1.0.0 (2022-11-08)
 
 
