@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/itsmichaelbtw/cache-clock/compare/v1.0.1...v1.1.0) (2022-11-09)
+
+
+### Fixed
+
+* incorrect title when creating a new release ([566eb1d](https://github.com/itsmichaelbtw/cache-clock/commit/566eb1db730986cfa2e4b20fc5905564bb6027e5))
+* missing run command within workflow ([fc587c3](https://github.com/itsmichaelbtw/cache-clock/commit/fc587c3f5914ff6bd85921838e5746a8be4dd8d2))
+
+
+### What's New
+
+* support for `autoStart` option ([18c2ef8](https://github.com/itsmichaelbtw/cache-clock/commit/18c2ef8d5744c3349de62b14468992f66d0168be))
+
 ### [1.0.1](https://github.com/itsmichaelbtw/cache-clock/compare/v1.0.0...v1.0.1) (2022-11-09)
 
 
