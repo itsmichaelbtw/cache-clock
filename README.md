@@ -19,7 +19,7 @@ A TypeScript implementation of a cache clock with TTL based expiry, driven by a 
 ## Features
 
 - Supports TypeScript
-- Built for NodeJS and the browser consumption
+- Built for NodeJS and the browser
 - Lightweight and fast (4kb gzipped)
 - Built-in automatic cache expiry
 - Entries are stored in a `Map` for fast retrieval
