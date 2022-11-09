@@ -36,6 +36,8 @@ jobs:
           tag: ${{ github.ref }}
           body: |
             See [CHANGELOG.md](CHANGELOG.md) for details.
+      - run: npm ci
+      - run: npm run build
   publish:
     needs: release
     runs-on: ubuntu-latest
