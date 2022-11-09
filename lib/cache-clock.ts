@@ -244,6 +244,14 @@ export class CacheClock {
      * clock from where it left off.
      */
     public start(): void {
+        if (this.options.interval === Infinity || this.options.interval === 0) {
+            debug(
+                "Disabling the clock due to an unsupported interval.",
+                "yellow"
+            );
+            return;
+        }
+
         if (this.$clock) {
             debug("Cache clock is already running. Unable to start.", "red");
             return;
