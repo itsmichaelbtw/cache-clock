@@ -31,7 +31,8 @@
     "release:major": "standard-version --release-as major",
     "release:prerelease": "standard-version --prerelease",
     "release": "standard-version",
-    "push:tags": "git push origin --follow-tags"
+    "push:tags": "git push origin --follow-tags",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
