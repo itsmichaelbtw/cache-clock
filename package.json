@@ -19,7 +19,8 @@
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
-    "package.json"
+    "package.json",
+    "tsconfig.json"
   ],
   "scripts": {
     "test": "ts-mocha -p tsconfig.json --recursive test/**/*.test.ts",
@@ -32,6 +33,7 @@
     "release:prerelease": "standard-version --prerelease",
     "release": "standard-version",
     "push:tags": "git push origin --follow-tags",
+    "prepublishOnly": "npm run build",
     "prepare": "husky install"
   },
   "repository": {
