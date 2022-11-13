@@ -28,8 +28,13 @@ A TypeScript implementation of a cache clock with TTL based expiry, driven by a 
 
 ## Installation
 
+npm:
 ```bash
 $ npm install cache-clock
+```
+yarn:
+```
+$ yarn add cache-clock
 ```
 
 ## Usage
