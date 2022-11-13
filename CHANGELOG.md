@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/itsmichaelbtw/cache-clock/compare/v1.1.0...v1.1.1) (2022-11-13)
+
+
+### Fixed
+
+* cd pipeline creating incorrect build outputs ([3582f0d](https://github.com/itsmichaelbtw/cache-clock/commit/3582f0d7e2ce9c54dfa3886e2a53fce40ca25302))
+* incorrect github actions token ([4e622bf](https://github.com/itsmichaelbtw/cache-clock/commit/4e622bf473733d2a3a9eec39a524f7967b015932))
+
 ## [1.1.0](https://github.com/itsmichaelbtw/cache-clock/compare/v1.0.1...v1.1.0) (2022-11-09)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "cache-clock",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An in-memory cache clock with TTL based expiry built for NodeJS and the browser.",
   "main": "dist/common/index.cjs",
   "module": "dist/module/index.esm.js",

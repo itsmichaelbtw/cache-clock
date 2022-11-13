@@ -1,5 +1,5 @@
 /**
-    * cache-clock v1.0.0
+    * cache-clock v1.1.0
     * https://github.com/itsmichaelbtw/cache-clock#readme
     * (c) 2022 Michael Cizek
     * @license MIT
@@ -212,7 +212,8 @@
     maxItems: 1000,
     ttl: Infinity,
     interval: 15 * 1000,
-    debug: false
+    debug: false,
+    autoStart: true
   };
   function invokeTimeout(callback, delay) {
     var timeout = environment === "node" ? global.setTimeout : window.setTimeout;
@@ -275,7 +276,9 @@
       this.$birth = timeProvider.now();
       this.$cache = new Map();
       this.configure(options);
-      this.start();
+      if (this.options.autoStart) {
+        this.start();
+      }
     }
     _createClass(CacheClock, [{
       key: "prune",

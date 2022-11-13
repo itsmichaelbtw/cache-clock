@@ -50,6 +50,16 @@ export interface ClockOptions {
      */
     interval?: number;
     /**
+     * Programatically determine if you wish for the clock to auto start.
+     *
+     * This only works when first initializing the clock. If you wish to
+     * start or stop the clock after initialization, use the `start` and `stop`
+     * methods.
+     *
+     * Defaults to `true`.
+     */
+    autoStart?: boolean;
+    /**
      * A function to call when an item has expired. This is called exclusively
      * when an item has expired and is removed from the cache via the internal clock.
      */
