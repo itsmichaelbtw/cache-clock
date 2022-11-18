@@ -1,5 +1,5 @@
 /**
-    * cache-clock v1.1.0
+    * cache-clock v1.1.1
     * https://github.com/itsmichaelbtw/cache-clock#readme
     * (c) 2022 Michael Cizek
     * @license MIT
@@ -336,6 +336,15 @@ var CacheClock = /*#__PURE__*/function () {
     key: "options",
     get: function get() {
       return this.$options;
+    }
+
+    /**
+     * Whether the clock is currently running.
+     */
+  }, {
+    key: "isRunning",
+    get: function get() {
+      return !!this.$clock;
     }
 
     /**

@@ -109,6 +109,10 @@ export declare class CacheClock {
      */
     get options(): ClockOptions;
     /**
+     * Whether the clock is currently running.
+     */
+    get isRunning(): boolean;
+    /**
      * Configure the cache clock. Use this method to change the global configuration
      * that applies to all cacheable items.
      *
