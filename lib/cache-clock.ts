@@ -239,6 +239,13 @@ export class CacheClock {
     }
 
     /**
+     * Whether the clock is currently running.
+     */
+    public get isRunning(): boolean {
+        return !!this.$clock;
+    }
+
+    /**
      * Configure the cache clock. Use this method to change the global configuration
      * that applies to all cacheable items.
      *

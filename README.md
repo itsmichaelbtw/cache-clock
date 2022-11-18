@@ -156,6 +156,13 @@ Update the cache clock configuration. Use this method to update the cache clock 
 
 > Note: When passing either Infinity or 0 as the interval, this disables the internal clock. If a clock has already started, once it has finished its current cycle, it will stop.
 
+### isRunning
+
+Returns a boolean indicating if the cache clock is running.
+
+```js
+cache.isRunning;
+```
 ### start()
 
 Start the cache clock. This is automatically called when the cache clock is created. You should only need to call this method if you have stopped the cache clock manually.
