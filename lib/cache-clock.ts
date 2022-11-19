@@ -406,6 +406,13 @@ export class CacheClock {
         this.$cache.clear();
     }
 
+    /**
+     * Create a cache key based on the input.
+     */
+    public getCacheKey(input: string): string {
+        return createEntityKey(input, false);
+    }
+
     public [Symbol.iterator](): IterableIterator<CacheEntry> {
         return this.$cache.values();
     }

@@ -139,6 +139,14 @@ An `object` representing the current options of the cache.
 cache.options;
 ```
 
+### isRunning
+
+Returns a boolean indicating if the cache clock is running.
+
+```js
+cache.isRunning;
+```
+
 ### configure([, options])
 
 Update the cache clock configuration. Use this method to update the cache clock configuration after the clock has been initialized. Any items in the cache prior to calling this method will not be affected. It is recommended to instead pass these options when initializing the constructor.
@@ -156,13 +164,6 @@ Update the cache clock configuration. Use this method to update the cache clock 
 
 > Note: When passing either Infinity or 0 as the interval, this disables the internal clock. If a clock has already started, once it has finished its current cycle, it will stop.
 
-### isRunning
-
-Returns a boolean indicating if the cache clock is running.
-
-```js
-cache.isRunning;
-```
 ### start()
 
 Start the cache clock. This is automatically called when the cache clock is created. You should only need to call this method if you have stopped the cache clock manually.
@@ -172,6 +173,10 @@ This will spawn a new clock with the full timeout interval. This does not resume
 ### stop()
 
 Manually stop the cache clock from running. This will disable the automatic expiration of entries. This does not prevent items from being checked for expiration when using the `.get()` or `.has()` method.
+
+### getCacheKey(input)
+
+Create a cache key from the input. This is used internally to create a hash of the key for fast lookup.
 
 ### set(key, value[, options])
 
