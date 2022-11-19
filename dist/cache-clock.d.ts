@@ -162,6 +162,10 @@ export declare class CacheClock {
      * Wipe the cache clean.
      */
     clear(): void;
+    /**
+     * Create a cache key based on the input.
+     */
+    getCacheKey(input: string): string;
     [Symbol.iterator](): IterableIterator<CacheEntry>;
 }
 export {};

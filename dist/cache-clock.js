@@ -1,5 +1,5 @@
 /**
-    * cache-clock v1.1.1
+    * cache-clock v1.2.0
     * https://github.com/itsmichaelbtw/cache-clock#readme
     * (c) 2022 Michael Cizek
     * @license MIT
@@ -495,6 +495,15 @@
       key: "clear",
       value: function clear() {
         this.$cache.clear();
+      }
+
+      /**
+       * Create a cache key based on the input.
+       */
+    }, {
+      key: "getCacheKey",
+      value: function getCacheKey(input) {
+        return createEntityKey(input, false);
       }
     }, {
       key: _Symbol$iterator,
