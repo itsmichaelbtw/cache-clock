@@ -6,7 +6,6 @@ import packageJson from "./package.json";
 
 const extensions = [".ts"];
 const banner = `/**
-    * ${packageJson.name} v${packageJson.version}
     * ${packageJson.homepage}
     * (c) ${new Date().getFullYear()} ${packageJson.author}
     * @license ${packageJson.license}
