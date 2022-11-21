@@ -1,5 +1,4 @@
 /**
-    * cache-clock v1.2.0
     * https://github.com/itsmichaelbtw/cache-clock#readme
     * (c) 2022 Michael Cizek
     * @license MIT

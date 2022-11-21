@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/itsmichaelbtw/cache-clock/compare/v1.3.0...v1.3.1) (2022-11-21)
+
+
+### Fixed
+
+* es module build output defaulting to wrong filepath ([3437264](https://github.com/itsmichaelbtw/cache-clock/commit/34372649926e04c919551060095d889c148c5592))
+
 ## [1.3.0](https://github.com/itsmichaelbtw/cache-clock/compare/v1.2.0...v1.3.0) (2022-11-19)
 
 
