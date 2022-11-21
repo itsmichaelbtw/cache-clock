@@ -17,7 +17,7 @@ export default {
     input: "lib/cache-clock.ts",
     output: [
         {
-            file: packageJson.main,
+            file: "dist/common/index.cjs",
             format: "cjs",
             sourcemap: true,
             exports: "named",
