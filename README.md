@@ -153,16 +153,20 @@ Update the cache clock configuration. Use this method to update the cache clock 
 
 #### options
 
-| Option    | Default  | Description                                                                                                                     |
-|-----------|----------|---------------------------------------------------------------------------------------------------------------------------------|
-| maxItems  | 1000     | The maximum number of items to store in the cache at once. Exceeding this limit will remove the oldest entry.                   |
-| ttl       | Infinity | The time to live for all entries in the cache.                                                                                  |
-| interval  | 15000    | The interval in ms to check for expired items. It is recommended to keep this value above `15 seconds` for optimal performance. |
-| onExpire  | null     | A function to call when an item has expired.                                                                                    |
-| autoStart | true     | Programmatically determine if you wish for the clock to auto start.                                                             |
-| debug     | false    | Log debug messages to the console. Includes success, warning and error messages.                                                |
+| Option               | Default  | Description                                                                                                                     |
+|----------------------|----------|---------------------------------------------------------------------------------------------------------------------------------|
+| maxItems             | 1000     | The maximum number of items to store in the cache at once. Exceeding this limit will remove the oldest entry.                   |
+| ttl                  | Infinity | The time to live for all entries in the cache.                                                                                  |
+| interval             | 15000    | The interval in ms to check for expired items. It is recommended to keep this value above `15 seconds` for optimal performance. |
+| onExpire             | null     | A function to call when an item has expired.                                                                                    |
+| overwrite            | false    | Whether to overwrite existing entries.                                                                                          |
+| resetTimeoutOnAccess | false    | When accessing entries via `get` or `has` if the expiration should be reset.                                                    |
+| autoStart            | true     | Programmatically determine if you wish for the clock to auto start.                                                             |
+| debug                | false    | Log debug messages to the console. Includes success, warning and error messages.                                                |                                               |
 
 > Note: When passing either Infinity or 0 as the interval, this disables the internal clock. If a clock has already started, once it has finished its current cycle, it will stop.
+
+To preserve false positives when `resetTimeoutOnAccess` is `true`, the expiration is checked before the timeout is reset. The expiration is also relative to the current time.
 
 ### start()
 
@@ -180,13 +184,19 @@ Create a cache key from the input. This is used internally to create a hash of t
 
 ### set(key, value[, options])
 
-Set a new cache entry. If the key already exists, the value will be overwritten by default. You can opt to not overwrite the value by passing { overwrite: false } as the third argument. 
 
 ```js
-cache.set('foo', 'bar', { ttl: 20000 });
+cache.set('foo', 'bar', { ttl: 20000 }); // CacheEntry object is returned
 ```
 
 When adding new entries, the cache is checked for overflow. If the cache is full, the oldest entry will be removed to make room for the new entry.
+
+#### options
+
+| Option               | Default  |
+|----------------------|----------|
+| overwrite            | false    |
+| ttl                  | false    |
 
 ### get(key)
 
@@ -230,6 +240,10 @@ Check if a cache entry exists by key. If the entry is not found, `false` will be
 ### clear()
 
 Clear all entries from the cache.
+
+### toJSON()
+
+Returns a JSON representation of the cache.
 
 ## Changelog
 
