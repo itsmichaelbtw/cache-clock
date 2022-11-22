@@ -208,7 +208,9 @@ var DEFAULT_CLOCK_OPTIONS = {
   ttl: Infinity,
   interval: 15 * 1000,
   debug: false,
-  autoStart: true
+  autoStart: true,
+  overwrite: false,
+  resetTimeoutOnAccess: false
 };
 function invokeTimeout(callback, delay) {
   var timeout = environment === "node" ? global.setTimeout : window.setTimeout;
@@ -415,22 +417,30 @@ var CacheClock = /*#__PURE__*/function () {
     value: function set(key, value, options) {
       var hashedKey = createEntityKey(key, false);
       var _parseCacheOptions = parseCacheOptions(options, this.options),
-        ttl = _parseCacheOptions.ttl;
+        ttl = _parseCacheOptions.ttl,
+        overwrite = _parseCacheOptions.overwrite;
       var clockItem = {
         k: hashedKey,
         v: value,
         t: ttl,
         e: timeProvider.now() + ttl
       };
-      if (this.has(hashedKey, true)) {
-        this.del(hashedKey);
+      var existingEntry = this.get(hashedKey, true);
+      if (existingEntry) {
+        if (overwrite) {
+          debug("Overwriting existing cache entry for key \"".concat(hashedKey, "\"."), "yellow");
+          this.del(hashedKey, true);
+        } else {
+          debug("Unable to set cache item \"".concat(hashedKey, "\". The item already exists."), "red");
+          return existingEntry;
+        }
       }
       if (this.size >= this.options.maxItems) {
         debug("The cache is full, removing oldest item.", "yellow");
         this.del(this.$cache.keys().next().value, true);
       }
       this.$cache.set(hashedKey, clockItem);
-      return this;
+      return clockItem;
     }
 
     /**
@@ -446,10 +456,14 @@ var CacheClock = /*#__PURE__*/function () {
       if (isUndefined(item)) {
         return undefined;
       }
-      if (item.e < timeProvider.now()) {
+      var now = timeProvider.now();
+      if (item.e < now) {
         debug("Cache item ".concat(key, " has expired."), "red");
-        this.del(key, true);
+        this.del(hashedKey, true);
         return undefined;
+      }
+      if (this.options.resetTimeoutOnAccess) {
+        item.e = now + item.t;
       }
       return item;
     }
@@ -480,7 +494,8 @@ var CacheClock = /*#__PURE__*/function () {
     value: function has(key) {
       var isHashed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var hashedKey = createEntityKey(key, isHashed);
-      return this.$cache.has(hashedKey);
+      var entry = this.get(hashedKey, true);
+      return !isUndefined(entry);
     }
 
     /**
@@ -499,6 +514,15 @@ var CacheClock = /*#__PURE__*/function () {
     key: "getCacheKey",
     value: function getCacheKey(input) {
       return createEntityKey(input, false);
+    }
+
+    /**
+     * Returns a JSON representation of the cache.
+     */
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return Array.from(this.$cache.values());
     }
   }, {
     key: _Symbol$iterator,

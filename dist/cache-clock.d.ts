@@ -60,16 +60,35 @@ export interface ClockOptions {
      */
     autoStart?: boolean;
     /**
-     * A function to call when an item has expired. This is called exclusively
-     * when an item has expired and is removed from the cache via the internal clock.
+     * When setting an item, if an entry already exists with the same key,
+     * choose whether to overwrite the existing entry or not.
+     *
+     * Defaults to `false`.
      */
-    onExpire?(entry: CacheEntry): void;
+    overwrite?: boolean;
+    /**
+     * When getting an item, indicate if you wish to reset the expiration
+     * time of the item. This includes when a duplicate item is found before
+     * attempting to set a new item.
+     *
+     * This will reset the expiration relative to the current time.
+     *
+     * Affected methods: `get`, `has` and `set` (when a duplicate is found).
+     *
+     * Defaults to `false`.
+     */
+    resetTimeoutOnAccess?: boolean;
     /**
      * Log debug messages to the console.
      */
     debug?: boolean;
+    /**
+     * A function to call when an item has expired. This is called exclusively
+     * when an item has expired and is removed from the cache via the internal clock.
+     */
+    onExpire?(entry: CacheEntry): void;
 }
-declare type CacheSetterOptions = Pick<ClockOptions, "ttl">;
+declare type CacheSetterOptions = Pick<ClockOptions, "ttl" | "overwrite">;
 export declare class CacheClock {
     private readonly $birth;
     private readonly $cache;
@@ -143,7 +162,7 @@ export declare class CacheClock {
      *
      * If the cache is full, the oldest item will be removed.
      */
-    set(key: string, value: unknown, options?: CacheSetterOptions): this;
+    set(key: string, value: unknown, options?: CacheSetterOptions): CacheEntry;
     /**
      * Retrieve an item from the cache. This returns the internal
      * `CacheEntry` used to store the value.
@@ -166,6 +185,10 @@ export declare class CacheClock {
      * Create a cache key based on the input.
      */
     getCacheKey(input: string): string;
+    /**
+     * Returns a JSON representation of the cache.
+     */
+    toJSON(): CacheEntry[];
     [Symbol.iterator](): IterableIterator<CacheEntry>;
 }
 export {};

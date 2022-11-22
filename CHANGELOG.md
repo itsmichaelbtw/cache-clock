@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/itsmichaelbtw/cache-clock/compare/v1.3.1...v1.4.0) (2022-11-22)
+
+
+### Fixed
+
+* duplicate items when using `set` method failed to properly delete ([3446c46](https://github.com/itsmichaelbtw/cache-clock/commit/3446c46d029fa3be3bc72500ab87b1f3bba5514a))
+
+
+### What's New
+
+* `set` method now returns the new `CacheEntry` property ([47f3563](https://github.com/itsmichaelbtw/cache-clock/commit/47f35634d59d76f808b400c1d0941284abffb62b))
+* control whether accessing items should reset the expiration ([4c3d0cc](https://github.com/itsmichaelbtw/cache-clock/commit/4c3d0cc7c70b6540063f6a5c73869b043d2e7ade))
+* new `toJSON` method ([38e15fa](https://github.com/itsmichaelbtw/cache-clock/commit/38e15fa9c5fc37cfbba17deeb63c380755b7bf72))
+* support for duplicate entry protection via `overwrite` flag ([b86fd4a](https://github.com/itsmichaelbtw/cache-clock/commit/b86fd4aeb4d6f2fdd468f77714a2bf626007f72b))
+
 ### [1.3.1](https://github.com/itsmichaelbtw/cache-clock/compare/v1.3.0...v1.3.1) (2022-11-21)
 
 
