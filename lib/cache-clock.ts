@@ -81,24 +81,44 @@ export interface ClockOptions {
      */
     autoStart?: boolean;
     /**
-     * A function to call when an item has expired. This is called exclusively
-     * when an item has expired and is removed from the cache via the internal clock.
+     * When setting an item, if an entry already exists with the same key,
+     * choose whether to overwrite the existing entry or not.
+     *
+     * Defaults to `false`.
      */
-    onExpire?(entry: CacheEntry): void;
+    overwrite?: boolean;
+    /**
+     * When getting an item, indicate if you wish to reset the expiration
+     * time of the item. This includes when a duplicate item is found before
+     * attempting to set a new item.
+     *
+     * This will increase the expiration by the current time to live value.
+     *
+     * Affected methods: `get`, `has` and `set` (when a duplicate is found).
+     *
+     * Defaults to `false`.
+     */
+    resetTimeoutOnAccess?: boolean;
     /**
      * Log debug messages to the console.
      */
     debug?: boolean;
+    /**
+     * A function to call when an item has expired. This is called exclusively
+     * when an item has expired and is removed from the cache via the internal clock.
+     */
+    onExpire?(entry: CacheEntry): void;
 }
 
-type CacheSetterOptions = Pick<ClockOptions, "ttl">;
+type CacheSetterOptions = Pick<ClockOptions, "ttl" | "overwrite">;
 
 const DEFAULT_CLOCK_OPTIONS: ClockOptions = {
     maxItems: 1000,
     ttl: Infinity,
     interval: 15 * 1000,
     debug: false,
-    autoStart: true
+    autoStart: true,
+    overwrite: false
 };
 
 function invokeTimeout(callback: Function, delay: number): Timeout {
@@ -326,7 +346,7 @@ export class CacheClock {
     ): CacheEntry {
         const hashedKey = createEntityKey(key, false);
 
-        const { ttl } = parseCacheOptions(options, this.options);
+        const { ttl, overwrite } = parseCacheOptions(options, this.options);
 
         const clockItem: CacheEntry = {
             k: hashedKey,
@@ -335,8 +355,22 @@ export class CacheClock {
             e: timeProvider.now() + ttl
         };
 
-        if (this.has(hashedKey, true)) {
-            this.del(hashedKey, true);
+        const existingEntry = this.get(hashedKey, true);
+
+        if (existingEntry) {
+            if (overwrite) {
+                debug(
+                    `Overwriting existing cache entry for key "${hashedKey}".`,
+                    "yellow"
+                );
+                this.del(hashedKey, true);
+            } else {
+                debug(
+                    `Unable to set cache item "${hashedKey}". The item already exists.`,
+                    "red"
+                );
+                return existingEntry;
+            }
         }
 
         if (this.size >= this.options.maxItems) {
