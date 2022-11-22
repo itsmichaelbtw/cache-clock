@@ -336,7 +336,7 @@ export class CacheClock {
         };
 
         if (this.has(hashedKey, true)) {
-            this.del(hashedKey);
+            this.del(hashedKey, true);
         }
 
         if (this.size >= this.options.maxItems) {
@@ -364,7 +364,7 @@ export class CacheClock {
 
         if (item.e < timeProvider.now()) {
             debug(`Cache item ${key} has expired.`, "red");
-            this.del(key, true);
+            this.del(hashedKey, true);
             return undefined;
         }
 
