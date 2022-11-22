@@ -92,7 +92,7 @@ export interface ClockOptions {
      * time of the item. This includes when a duplicate item is found before
      * attempting to set a new item.
      *
-     * This will increase the expiration by the current time to live value.
+     * This will reset the expiration relative to the current time.
      *
      * Affected methods: `get`, `has` and `set` (when a duplicate is found).
      *
@@ -118,7 +118,8 @@ const DEFAULT_CLOCK_OPTIONS: ClockOptions = {
     interval: 15 * 1000,
     debug: false,
     autoStart: true,
-    overwrite: false
+    overwrite: false,
+    resetTimeoutOnAccess: false
 };
 
 function invokeTimeout(callback: Function, delay: number): Timeout {
@@ -395,10 +396,16 @@ export class CacheClock {
             return undefined;
         }
 
-        if (item.e < timeProvider.now()) {
+        const now = timeProvider.now();
+
+        if (item.e < now) {
             debug(`Cache item ${key} has expired.`, "red");
             this.del(hashedKey, true);
             return undefined;
+        }
+
+        if (this.options.resetTimeoutOnAccess) {
+            item.e = now + item.t;
         }
 
         return item;
@@ -428,8 +435,9 @@ export class CacheClock {
      */
     public has(key: string, isHashed: boolean = false): boolean {
         const hashedKey = createEntityKey(key, isHashed);
+        const entry = this.get(hashedKey, true);
 
-        return this.$cache.has(hashedKey);
+        return !isUndefined(entry);
     }
 
     /**
