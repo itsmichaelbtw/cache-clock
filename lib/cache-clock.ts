@@ -412,6 +412,13 @@ export class CacheClock {
         return createEntityKey(input, false);
     }
 
+    /**
+     * Returns a JSON representation of the cache.
+     */
+    public toJSON(): CacheEntry[] {
+        return Array.from(this.$cache.values());
+    }
+
     public [Symbol.iterator](): IterableIterator<CacheEntry> {
         return this.$cache.values();
     }
