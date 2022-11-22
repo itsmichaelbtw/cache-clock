@@ -323,7 +323,7 @@ export class CacheClock {
         key: string,
         value: unknown,
         options?: CacheSetterOptions
-    ): this {
+    ): CacheEntry {
         const hashedKey = createEntityKey(key, false);
 
         const { ttl } = parseCacheOptions(options, this.options);
@@ -345,8 +345,7 @@ export class CacheClock {
         }
 
         this.$cache.set(hashedKey, clockItem);
-
-        return this;
+        return clockItem;
     }
 
     /**
