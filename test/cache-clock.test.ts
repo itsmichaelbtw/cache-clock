@@ -90,15 +90,51 @@ describe("Cache Clock", () => {
             chai.expect(cache.get("foo").v).to.equal("bar");
             chai.expect(cache.get("foo").t).to.equal(10000);
         });
+
+        it("should return the newly added item", () => {
+            const item = cache.set("foo", "bar");
+
+            chai.expect(item).to.be.an("object");
+            chai.expect(item).to.have.property("k");
+            chai.expect(item).to.have.property("v");
+            chai.expect(item).to.have.property("t");
+            chai.expect(item).to.have.property("e");
+        });
+
+        it("should not overwrite an existing entry", () => {
+            cache.set("foo", "bar");
+            cache.set("foo", "baz");
+
+            const entry = cache.get("foo");
+
+            chai.expect(cache.size).to.equal(1);
+            chai.expect(entry).to.be.an("object");
+            chai.expect(entry.v).to.equal("bar");
+        });
+
+        it("should overwrite an existing entry", () => {
+            cache.set("foo", "bar");
+            cache.set("foo", "baz", {
+                overwrite: true
+            });
+
+            const entry = cache.get("foo");
+
+            chai.expect(cache.size).to.equal(1);
+            chai.expect(entry).to.be.an("object");
+            chai.expect(entry.v).to.equal("baz");
+        });
     });
 
     describe("get", () => {
         it("should return an item from the cache", () => {
             cache.set("foo", "bar");
 
-            chai.expect(cache.get("foo")).to.not.be.undefined;
-            chai.expect(cache.get("foo")).to.be.an("object");
-            chai.expect(cache.get("foo").v).to.equal("bar");
+            const item = cache.get("foo");
+
+            chai.expect(item).to.not.be.undefined;
+            chai.expect(item).to.be.an("object");
+            chai.expect(item.v).to.equal("bar");
         });
 
         it("should return undefined if the item does not exist", () => {
@@ -114,6 +150,27 @@ describe("Cache Clock", () => {
 
             setTimeout(() => {
                 chai.expect(cache.get("foo")).to.be.undefined;
+                chai.expect(cache.size).to.equal(0);
+                done();
+            }, 350);
+        });
+
+        it("should reset the expiration when accessed", (done) => {
+            cache.configure({
+                resetTimeoutOnAccess: true
+            });
+
+            cache.set("foo", "bar", {
+                ttl: 250
+            });
+
+            setTimeout(() => {
+                chai.expect(cache.get("foo")).to.not.be.undefined;
+            }, 200);
+
+            setTimeout(() => {
+                chai.expect(cache.get("foo")).to.not.be.undefined;
+                chai.expect(cache.size).to.equal(1);
                 done();
             }, 350);
         });
@@ -181,6 +238,86 @@ describe("Cache Clock", () => {
             chai.expect(item).to.be.an("object");
             chai.expect(item.v).to.be.a("string");
             chai.expect(item.t).to.be.a("number");
+        }
+    });
+
+    it("should periodically clear expired items", (done) => {
+        cache.stop();
+
+        cache.configure({
+            interval: 500
+        });
+
+        cache.start();
+
+        cache.set("foo", "bar", {
+            ttl: 250
+        });
+
+        chai.expect(cache.size).to.equal(1);
+
+        setTimeout(() => {
+            chai.expect(cache.size).to.equal(0);
+            done();
+        }, 750);
+    });
+
+    it("should not clear expired items if the interval is set to 0", (done) => {
+        cache.stop();
+
+        cache.configure({
+            interval: 0
+        });
+
+        cache.start();
+
+        cache.set("foo", "bar", {
+            ttl: 250
+        });
+
+        chai.expect(cache.size).to.equal(1);
+
+        setTimeout(() => {
+            chai.expect(cache.size).to.equal(1);
+            done();
+        }, 750);
+    });
+
+    it("providing an `onExpire` callback should be called when an item expires", (done) => {
+        cache.stop();
+
+        cache.configure({
+            interval: 500,
+            onExpire: () => {
+                chai.expect(cache.size).to.equal(0);
+                done();
+            }
+        });
+
+        cache.start();
+
+        cache.set("foo", "bar", {
+            ttl: 250
+        });
+    });
+
+    it("should not overflow the `maxItems` property", () => {
+        cache.configure({
+            maxItems: 5
+        });
+
+        for (let i = 0; i < 10; i++) {
+            cache.set(String(i), i);
+        }
+
+        chai.expect(cache.size).to.equal(5);
+
+        for (let i = 0; i < 5; i++) {
+            chai.expect(cache.has(String(i))).to.be.false;
+        }
+
+        for (let i = 5; i < 10; i++) {
+            chai.expect(cache.has(String(i))).to.be.true;
         }
     });
 });
