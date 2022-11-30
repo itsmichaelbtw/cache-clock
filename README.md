@@ -13,6 +13,7 @@ A TypeScript implementation of a cache clock with TTL based expiry, driven by a 
 - [Usage](#usage)
 - [Examples](#examples)
 - [API](#api)
+- [Cache Statistics](#cache-statistics)
 - [Changelog](#changelog)
 - [License](#license)
 
@@ -244,6 +245,57 @@ Clear all entries from the cache.
 ### toJSON()
 
 Returns a JSON representation of the cache.
+
+## Cache Statistics
+
+The cache module now supports internal counters so you can visualise the cache usage. This is useful for debugging and monitoring.
+
+All counters are made available via `cache.stats` accessor.
+
+```typescript
+export interface CacheStatistics {
+    /**
+     * The number of times the cache was accessed.
+     */
+    hits: number;
+    /**
+     * The number of items that were added to the cache.
+     */
+    sets: number;
+    /**
+     * The number of times the cache was accessed and
+     * no item was found.
+     */
+    misses: number;
+    /**
+     * The number of items that were removed from the
+     * cache due to `maxItems` overflowing.
+     */
+    evictions: number;
+    /**
+     * The number of items that were removed from the
+     * cache due to expiration.
+     */
+    expired: number;
+    /**
+     * The number of items that were deleted from the
+     * cache.
+     */
+    deletes: number;
+    /**
+     * The number of items that were overwritten.
+     */
+    overwrites: number;
+    /**
+     * The number of times the cache was cleared.
+     */
+    clears: number;
+    /**
+     * The number of life-cycle events that were triggered.
+     */
+    lifecycles: number;
+}
+```
 
 ## Changelog
 
