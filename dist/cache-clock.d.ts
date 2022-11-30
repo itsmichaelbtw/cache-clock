@@ -88,12 +88,55 @@ export interface ClockOptions {
      */
     onExpire?(entry: CacheEntry): void;
 }
+export interface CacheStatistics {
+    /**
+     * The number of times the cache was accessed.
+     */
+    hits: number;
+    /**
+     * The number of items that were added to the cache.
+     */
+    sets: number;
+    /**
+     * The number of times the cache was accessed and
+     * no item was found.
+     */
+    misses: number;
+    /**
+     * The number of items that were removed from the
+     * cache due to `maxItems` overflowing.
+     */
+    evictions: number;
+    /**
+     * The number of items that were removed from the
+     * cache due to expiration.
+     */
+    expired: number;
+    /**
+     * The number of items that were deleted from the
+     * cache.
+     */
+    deletes: number;
+    /**
+     * The number of items that were overwritten.
+     */
+    overwrites: number;
+    /**
+     * The number of times the cache was cleared.
+     */
+    clears: number;
+    /**
+     * The number of life-cycle events that were triggered.
+     */
+    lifecycles: number;
+}
 declare type CacheSetterOptions = Pick<ClockOptions, "ttl" | "overwrite">;
 export declare class CacheClock {
     private readonly $birth;
     private readonly $cache;
     private $clock;
     private $options;
+    private $statistics;
     /**
      * Create a new instance of the cache clock. You can
      * pass a configuration object to set the default
@@ -127,6 +170,7 @@ export declare class CacheClock {
      * Global configuration that applies to all cacheable items.
      */
     get options(): ClockOptions;
+    get stats(): CacheStatistics;
     /**
      * Whether the clock is currently running.
      */
@@ -144,6 +188,10 @@ export declare class CacheClock {
      * ```
      */
     configure(options?: ClockOptions): void;
+    /**
+     * Create a cache key based on the input.
+     */
+    getCacheKey(input: string): string;
     /**
      * Start the cache clock. This is automatically called when the cache clock is created.
      * You should only need to call this method if you have stopped the cache clock manually.
@@ -182,9 +230,9 @@ export declare class CacheClock {
      */
     clear(): void;
     /**
-     * Create a cache key based on the input.
+     * Reset the cache statistics.
      */
-    getCacheKey(input: string): string;
+    resetStats(): void;
     /**
      * Returns a JSON representation of the cache.
      */

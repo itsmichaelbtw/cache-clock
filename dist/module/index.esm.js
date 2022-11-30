@@ -189,18 +189,8 @@ function hash(input) {
   return numberHash.toString(32);
 }
 
-function getBestTimeProvider() {
-  try {
-    // future: use either perf_hooks for node js or performance for browser
-    // fallback on Date.now() for now
-    return Date;
-  } catch (error) {
-    return Date;
-  }
-}
-var timeProvider = getBestTimeProvider();
-
 var _Symbol$iterator;
+var timeProvider = Date;
 var DEFAULT_CLOCK_OPTIONS = {
   maxItems: 1000,
   ttl: Infinity,
@@ -251,6 +241,17 @@ function createEntityKey(key, isHashed) {
   }
   return hash(stringify(key));
 }
+var DEFAULT_STATISTCS = {
+  hits: 0,
+  sets: 0,
+  misses: 0,
+  evictions: 0,
+  expired: 0,
+  deletes: 0,
+  overwrites: 0,
+  clears: 0,
+  lifecycles: 0
+};
 _Symbol$iterator = Symbol.iterator;
 var CacheClock = /*#__PURE__*/function () {
   /**
@@ -268,9 +269,11 @@ var CacheClock = /*#__PURE__*/function () {
     _defineProperty(this, "$cache", void 0);
     _defineProperty(this, "$clock", void 0);
     _defineProperty(this, "$options", void 0);
+    _defineProperty(this, "$statistics", void 0);
     this.$birth = timeProvider.now();
     this.$cache = new Map();
     this.configure(options);
+    this.$statistics = Object.assign({}, DEFAULT_STATISTCS);
     if (this.options.autoStart) {
       this.start();
     }
@@ -290,6 +293,7 @@ var CacheClock = /*#__PURE__*/function () {
             if (this.options.onExpire && _entry) {
               this.options.onExpire(_entry);
             }
+            this.$statistics.expired++;
           }
         }
       } catch (err) {
@@ -336,6 +340,11 @@ var CacheClock = /*#__PURE__*/function () {
     get: function get() {
       return this.$options;
     }
+  }, {
+    key: "stats",
+    get: function get() {
+      return this.$statistics;
+    }
 
     /**
      * Whether the clock is currently running.
@@ -367,6 +376,15 @@ var CacheClock = /*#__PURE__*/function () {
       if (this.options.interval < DEFAULT_CLOCK_OPTIONS.interval) {
         debug("A cache clock interval less than 15 seconds is not recommended.", "yellow");
       }
+    }
+
+    /**
+     * Create a cache key based on the input.
+     */
+  }, {
+    key: "getCacheKey",
+    value: function getCacheKey(input) {
+      return createEntityKey(input, false);
     }
 
     /**
@@ -403,6 +421,7 @@ var CacheClock = /*#__PURE__*/function () {
       }
       clearTimeout(this.$clock);
       this.$clock = null;
+      this.$statistics.lifecycles++;
     }
 
     /**
@@ -428,6 +447,7 @@ var CacheClock = /*#__PURE__*/function () {
         if (overwrite) {
           debug("Overwriting existing cache entry for key \"".concat(hashedKey, "\"."), "yellow");
           this.del(hashedKey, true);
+          this.$statistics.overwrites++;
         } else {
           debug("Unable to set cache item \"".concat(hashedKey, "\". The item already exists."), "red");
           return existingEntry;
@@ -436,8 +456,10 @@ var CacheClock = /*#__PURE__*/function () {
       if (this.size >= this.options.maxItems) {
         debug("The cache is full, removing oldest item.", "yellow");
         this.del(this.$cache.keys().next().value, true);
+        this.$statistics.evictions++;
       }
       this.$cache.set(hashedKey, clockItem);
+      this.$statistics.sets++;
       return clockItem;
     }
 
@@ -451,13 +473,16 @@ var CacheClock = /*#__PURE__*/function () {
       var isHashed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var hashedKey = createEntityKey(key, isHashed);
       var item = this.$cache.get(hashedKey);
+      this.$statistics.hits++;
       if (isUndefined(item)) {
+        this.$statistics.misses++;
         return undefined;
       }
       var now = timeProvider.now();
       if (item.e < now) {
         debug("Cache item ".concat(key, " has expired."), "red");
         this.del(hashedKey, true);
+        this.$statistics.expired++;
         return undefined;
       }
       if (this.options.resetTimeoutOnAccess) {
@@ -481,6 +506,7 @@ var CacheClock = /*#__PURE__*/function () {
       }
       debug("Deleting cache item ".concat(key, "."), "green");
       this.$cache["delete"](hashedKey);
+      this.$statistics.deletes++;
       return item;
     }
 
@@ -503,15 +529,16 @@ var CacheClock = /*#__PURE__*/function () {
     key: "clear",
     value: function clear() {
       this.$cache.clear();
+      this.$statistics.clears++;
     }
 
     /**
-     * Create a cache key based on the input.
+     * Reset the cache statistics.
      */
   }, {
-    key: "getCacheKey",
-    value: function getCacheKey(input) {
-      return createEntityKey(input, false);
+    key: "resetStats",
+    value: function resetStats() {
+      this.$statistics = Object.assign({}, DEFAULT_STATISTCS);
     }
 
     /**
