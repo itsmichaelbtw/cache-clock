@@ -12,7 +12,8 @@ import {
 import { environment } from "./environment";
 import { debug } from "./debug";
 import { hash } from "./hash";
-import { timeProvider } from "./time-provider";
+
+const timeProvider = Date;
 
 type ClockMap = Map<string, CacheEntry>;
 type CacheTTL = number;
@@ -110,6 +111,49 @@ export interface ClockOptions {
     onExpire?(entry: CacheEntry): void;
 }
 
+export interface CacheStatistics {
+    /**
+     * The number of times the cache was accessed.
+     */
+    hits: number;
+    /**
+     * The number of items that were added to the cache.
+     */
+    sets: number;
+    /**
+     * The number of times the cache was accessed and
+     * no item was found.
+     */
+    misses: number;
+    /**
+     * The number of items that were removed from the
+     * cache due to `maxItems` overflowing.
+     */
+    evictions: number;
+    /**
+     * The number of items that were removed from the
+     * cache due to expiration.
+     */
+    expired: number;
+    /**
+     * The number of items that were deleted from the
+     * cache.
+     */
+    deletes: number;
+    /**
+     * The number of items that were overwritten.
+     */
+    overwrites: number;
+    /**
+     * The number of times the cache was cleared.
+     */
+    clears: number;
+    /**
+     * The number of life-cycle events that were triggered.
+     */
+    lifecycles: number;
+}
+
 type CacheSetterOptions = Pick<ClockOptions, "ttl" | "overwrite">;
 
 const DEFAULT_CLOCK_OPTIONS: ClockOptions = {
@@ -180,12 +224,25 @@ function createEntityKey(key: string, isHashed: boolean): string {
     return hash(stringify(key));
 }
 
+const DEFAULT_STATISTCS: CacheStatistics = {
+    hits: 0,
+    sets: 0,
+    misses: 0,
+    evictions: 0,
+    expired: 0,
+    deletes: 0,
+    overwrites: 0,
+    clears: 0,
+    lifecycles: 0
+};
+
 export class CacheClock {
     private readonly $birth: number;
     private readonly $cache: ClockMap;
 
     private $clock: Timeout;
     private $options: ClockOptions;
+    private $statistics: CacheStatistics;
 
     /**
      * Create a new instance of the cache clock. You can
@@ -201,6 +258,8 @@ export class CacheClock {
         this.$cache = new Map();
 
         this.configure(options);
+
+        this.$statistics = Object.assign({}, DEFAULT_STATISTCS);
 
         if (this.options.autoStart) {
             this.start();
@@ -219,6 +278,8 @@ export class CacheClock {
                 if (this.options.onExpire && entry) {
                     this.options.onExpire(entry);
                 }
+
+                this.$statistics.expired++;
             }
         }
 
@@ -259,6 +320,10 @@ export class CacheClock {
         return this.$options;
     }
 
+    public get stats(): CacheStatistics {
+        return this.$statistics;
+    }
+
     /**
      * Whether the clock is currently running.
      */
@@ -292,6 +357,13 @@ export class CacheClock {
                 "yellow"
             );
         }
+    }
+
+    /**
+     * Create a cache key based on the input.
+     */
+    public getCacheKey(input: string): string {
+        return createEntityKey(input, false);
     }
 
     /**
@@ -333,6 +405,8 @@ export class CacheClock {
 
         clearTimeout(this.$clock);
         this.$clock = null;
+
+        this.$statistics.lifecycles++;
     }
 
     /**
@@ -365,6 +439,7 @@ export class CacheClock {
                     "yellow"
                 );
                 this.del(hashedKey, true);
+                this.$statistics.overwrites++;
             } else {
                 debug(
                     `Unable to set cache item "${hashedKey}". The item already exists.`,
@@ -377,9 +452,11 @@ export class CacheClock {
         if (this.size >= this.options.maxItems) {
             debug("The cache is full, removing oldest item.", "yellow");
             this.del(this.$cache.keys().next().value, true);
+            this.$statistics.evictions++;
         }
 
         this.$cache.set(hashedKey, clockItem);
+        this.$statistics.sets++;
         return clockItem;
     }
 
@@ -392,7 +469,10 @@ export class CacheClock {
 
         const item = this.$cache.get(hashedKey);
 
+        this.$statistics.hits++;
+
         if (isUndefined(item)) {
+            this.$statistics.misses++;
             return undefined;
         }
 
@@ -401,6 +481,7 @@ export class CacheClock {
         if (item.e < now) {
             debug(`Cache item ${key} has expired.`, "red");
             this.del(hashedKey, true);
+            this.$statistics.expired++;
             return undefined;
         }
 
@@ -426,6 +507,7 @@ export class CacheClock {
 
         debug(`Deleting cache item ${key}.`, "green");
         this.$cache.delete(hashedKey);
+        this.$statistics.deletes++;
 
         return item;
     }
@@ -445,13 +527,14 @@ export class CacheClock {
      */
     public clear(): void {
         this.$cache.clear();
+        this.$statistics.clears++;
     }
 
     /**
-     * Create a cache key based on the input.
+     * Reset the cache statistics.
      */
-    public getCacheKey(input: string): string {
-        return createEntityKey(input, false);
+    public resetStats(): void {
+        this.$statistics = Object.assign({}, DEFAULT_STATISTCS);
     }
 
     /**
