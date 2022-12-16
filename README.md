@@ -1,6 +1,6 @@
 # cache-clock 
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/itsmichaelbtw/cache-clock/Unit%20Tests?label=tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/itsmichaelbtw/cache-clock/unit-tests.yml?label=tests&branch=main)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/itsmichaelbtw/cache-clock)
 ![GitHub](https://img.shields.io/github/license/itsmichaelbtw/cache-clock)
 
