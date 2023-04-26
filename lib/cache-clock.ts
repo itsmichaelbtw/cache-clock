@@ -20,7 +20,7 @@ type CacheTTL = number;
 
 type Timeout = number | NodeJS.Timeout;
 
-export interface CacheEntry {
+export interface CacheEntry<T = any> {
     /**
      * Hashed key of the item.
      */
@@ -28,7 +28,7 @@ export interface CacheEntry {
     /**
      * Value passed to be stored.
      */
-    v: unknown;
+    v: T;
     /**
      * The time to live for the item. If `Infinity`, the item will never expire.
      */
@@ -414,11 +414,11 @@ export class CacheClock {
      *
      * If the cache is full, the oldest item will be removed.
      */
-    public set(
+    public set<T>(
         key: string,
-        value: unknown,
+        value: T,
         options?: CacheSetterOptions
-    ): CacheEntry {
+    ): CacheEntry<T> {
         const hashedKey = createEntityKey(key, false);
 
         const { ttl, overwrite } = parseCacheOptions(options, this.options);
@@ -430,7 +430,7 @@ export class CacheClock {
             e: timeProvider.now() + ttl
         };
 
-        const existingEntry = this.get(hashedKey, true);
+        const existingEntry = this.get<T>(hashedKey, true);
 
         if (existingEntry) {
             if (overwrite) {
@@ -464,7 +464,7 @@ export class CacheClock {
      * Retrieve an item from the cache. This returns the internal
      * `CacheEntry` used to store the value.
      */
-    public get(key: string, isHashed: boolean = false): CacheEntry {
+    public get<T>(key: string, isHashed: boolean = false): CacheEntry<T> {
         const hashedKey = createEntityKey(key, isHashed);
 
         const item = this.$cache.get(hashedKey);
@@ -496,7 +496,7 @@ export class CacheClock {
      * Deletes an item from the cache. Returns the deleted item
      * if it exists.
      */
-    public del(key: string, isHashed: boolean = false): CacheEntry {
+    public del<T>(key: string, isHashed: boolean = false): CacheEntry<T> {
         const hashedKey = createEntityKey(key, isHashed);
 
         const item = this.$cache.get(hashedKey);
@@ -548,3 +548,4 @@ export class CacheClock {
         return this.$cache.values();
     }
 }
+
