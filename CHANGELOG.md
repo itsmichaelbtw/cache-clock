@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/itsmichaelbtw/cache-clock/compare/v1.5.0...v1.6.0) (2023-04-26)
+
+
+### What's New
+
+* added type generics to cache value ([562ef7e](https://github.com/itsmichaelbtw/cache-clock/commit/562ef7e98a8d3b00174b2e6f83454ecba9ad2189))
+
 ## [1.5.0](https://github.com/itsmichaelbtw/cache-clock/compare/v1.4.0...v1.5.0) (2022-11-30)
 
 

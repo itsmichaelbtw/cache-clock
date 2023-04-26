@@ -1,5 +1,5 @@
 declare type CacheTTL = number;
-export interface CacheEntry {
+export interface CacheEntry<T = any> {
     /**
      * Hashed key of the item.
      */
@@ -7,7 +7,7 @@ export interface CacheEntry {
     /**
      * Value passed to be stored.
      */
-    v: unknown;
+    v: T;
     /**
      * The time to live for the item. If `Infinity`, the item will never expire.
      */
@@ -210,17 +210,17 @@ export declare class CacheClock {
      *
      * If the cache is full, the oldest item will be removed.
      */
-    set(key: string, value: unknown, options?: CacheSetterOptions): CacheEntry;
+    set<T>(key: string, value: T, options?: CacheSetterOptions): CacheEntry<T>;
     /**
      * Retrieve an item from the cache. This returns the internal
      * `CacheEntry` used to store the value.
      */
-    get(key: string, isHashed?: boolean): CacheEntry;
+    get<T>(key: string, isHashed?: boolean): CacheEntry<T>;
     /**
      * Deletes an item from the cache. Returns the deleted item
      * if it exists.
      */
-    del(key: string, isHashed?: boolean): CacheEntry;
+    del<T>(key: string, isHashed?: boolean): CacheEntry<T>;
     /**
      * Returns a boolean indicating whether the cache contains an item.
      */

@@ -1,6 +1,6 @@
 /**
     * https://github.com/itsmichaelbtw/cache-clock#readme
-    * (c) 2022 Michael Cizek
+    * (c) 2023 Michael Cizek
     * @license MIT
     */
 
